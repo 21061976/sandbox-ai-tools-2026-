@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניהול סיכונים למסלול ארגז חול רגולטורי</title>
+<style>
+:root{
+  --red:#d64545;
+  --orange:#d97b2b;
+  --yellow:#c99a25;
+  --green:#2f8c5f;
+  --dark:#2d3748;
+  --mid:#475269;
+  --light-bg:#f7f8fa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+  background:var(--light-bg);
+  color:var(--dark);
+  line-height:1.65;
+}
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  background:#fff;
+  box-shadow:0 10px 35px rgba(0,0,0,.08);
+}
+.toolbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;gap:10px;justify-content:flex-end;
+  padding:10px 20px;background:#fff;border-bottom:1px solid #e5e7eb;
+}
+.toolbar button{
+  border:none;border-radius:8px;padding:9px 16px;font-size:.9em;cursor:pointer;
+  background:var(--mid);color:#fff;
+}
+.toolbar button.pdf{background:var(--red);}
+header.report-header{
+  background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 100%);
+  color:#fff;padding:38px 40px 30px;
+}
+header.report-header .kicker{
+  font-size:.85em;opacity:.75;letter-spacing:.5px;margin-bottom:6px;
+}
+header.report-header h1{
+  font-size:1.9em;margin-bottom:10px;
+}
+header.report-header .sub{
+  font-size:1.05em;opacity:.92;max-width:820px;margin-bottom:22px;
+}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;}
+.meta-pill{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:7px 16px;font-size:.85em;
+}
+.meta-pill b{font-weight:600;}
+.anchors-section{padding:22px 40px;border-bottom:1px solid #edf0f3;}
+.anchors-section h3{font-size:.95em;color:#6b7280;margin-bottom:10px;font-weight:600;}
+.anchors-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+.anchor-tag{
+  background:#eef1f6;color:var(--mid);border-radius:14px;
+  padding:5px 12px;font-size:.82em;
+}
+.stages-row{
+  display:flex;gap:14px;padding:20px 40px;border-bottom:1px solid #edf0f3;
+  background:#fbfbfc;
+}
+.stage{
+  flex:1;text-align:center;background:#fff;border:1px solid #e5e7eb;
+  border-radius:10px;padding:14px 10px;font-size:.9em;color:var(--mid);
+}
+.stage .ic{font-size:1.4em;display:block;margin-bottom:4px;}
+.compare-row{
+  display:flex;gap:14px;padding:20px 40px;border-bottom:1px solid #edf0f3;
+}
+.compare-card{
+  flex:1;border-radius:10px;padding:14px 16px;font-size:.85em;
+  border:1px solid #e5e7eb;
+}
+.compare-card.sandbox{background:#faf0d9;border-color:var(--yellow);}
+.compare-card h4{font-size:.95em;margin-bottom:6px;color:var(--mid);}
+.compare-card.sandbox h4{color:#8a6a12;}
+.stats-row{
+  display:flex;gap:16px;padding:26px 40px;border-bottom:1px solid #edf0f3;
+}
+.stat-card{
+  flex:1;text-align:center;border-radius:12px;padding:18px 10px;
+  background:var(--light-bg);
+}
+.stat-num{font-size:2.1em;font-weight:700;}
+.stat-num.red{color:var(--red);}
+.stat-num.yellow{color:var(--yellow);}
+.stat-num.total{color:var(--mid);}
+.stat-lbl{font-size:.82em;color:#6b7280;margin-top:4px;}
+.risk-groups{padding:10px 40px 6px;}
+.cat-header{
+  display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;
+}
+.cat-header .ic{font-size:1.3em;}
+.cat-header .name{font-size:1.15em;font-weight:700;color:var(--mid);}
+.cat-header .desc{font-size:.85em;color:#6b7280;}
+.risk-card{
+  border:1px solid #e5e7eb;border-radius:12px;padding:20px 22px;
+  border-right:6px solid #ccc;margin-bottom:8px;background:#fff;
+}
+.risk-card.red-border{border-right-color:var(--red);}
+.risk-card.orange-border{border-right-color:var(--orange);}
+.risk-card.yellow-border{border-right-color:var(--yellow);}
+.risk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+.risk-num{
+  display:inline-block;background:var(--mid);color:#fff;border-radius:50%;
+  width:26px;height:26px;text-align:center;line-height:26px;font-size:.8em;margin-left:8px;
+}
+.risk-title{font-size:1.12em;font-weight:700;color:var(--dark);}
+.sev-tag{border-radius:14px;padding:5px 13px;font-size:.8em;font-weight:600;white-space:nowrap;}
+.sev-red{background:#fbe6e6;color:#b3312f;}
+.sev-yellow{background:#faf0d9;color:#8a6a12;}
+.risk-topics{margin:10px 0 6px;font-size:.8em;color:#6b7280;}
+.risk-topics span{background:#f1f3f6;border-radius:10px;padding:3px 10px;margin-left:6px;display:inline-block;margin-bottom:4px;}
+.score-row{display:flex;gap:24px;margin:10px 0 14px;font-size:.85em;color:var(--mid);}
+.score-row b{font-size:1.15em;color:var(--dark);}
+.desc-box{
+  background:var(--light-bg);border-radius:8px;padding:13px 16px;
+  font-size:.92em;margin-bottom:14px;
+}
+.desc-box .quote{color:var(--mid);display:block;margin-bottom:6px;}
+.impact-opp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+.impact-col,.opp-col{font-size:.88em;}
+.impact-col .h,.opp-col .h{font-weight:700;margin-bottom:6px;}
+.impact-col .h{color:var(--red);}
+.opp-col .h{color:var(--green);}
+.impact-col ul,.opp-col ul{padding-right:18px;}
+.impact-col li,.opp-col li{margin-bottom:4px;}
+.cond-list{background:#f0f7f3;border-radius:8px;padding:12px 16px;font-size:.88em;}
+.cond-list .h{font-weight:700;color:var(--green);margin-bottom:6px;}
+.cond-list ol{padding-right:18px;}
+.cond-list li{margin-bottom:4px;}
+.summary-section{padding:10px 40px 30px;}
+.summary-section h3{font-size:1.15em;color:var(--mid);margin:20px 0 12px;}
+table.summary-table{width:100%;border-collapse:collapse;font-size:.88em;}
+table.summary-table th{
+  background:var(--mid);color:#fff;padding:10px 12px;text-align:right;font-weight:600;
+}
+table.summary-table td{padding:10px 12px;border-bottom:1px solid #edf0f3;vertical-align:top;}
+table.summary-table tr:nth-child(even) td{background:#fafbfc;}
+.page-footer{
+  background:var(--dark);color:#cbd5e0;padding:22px 40px;font-size:.85em;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.page-footer .credit{color:#9ca3af;font-size:.85em;}
+@media print{
+  .toolbar{display:none;}
+  body{background:#fff;}
+  .container{box-shadow:none;max-width:100%;}
+  .risk-card{page-break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="toolbar">
+<button onclick="document.body.contentEditable=document.body.contentEditable!=='true'; this.textContent = document.body.contentEditable==='true' ? '✅ סיים עריכה' : '🎨 עריכה'">🎨 עריכה</button>
+<button class="pdf" onclick="window.print()">📄 ייצוא PDF</button>
+</div>
+
+<header class="report-header">
+  <div class="kicker editable">דוח ניהול סיכונים קצר · 3 סיכונים מרכזיים</div>
+  <h1 class="editable">ניהול סיכונים למסלול ארגז חול רגולטורי</h1>
+  <div class="sub editable">השוואה ממוקדת של מסלול ארגז החול הרגולטורי מול מסלול רגיל ומסלול מקוצר לבדיקה ואישור כלים טכנולוגיים, בהתבסס על תרשימי המסלולים בנספח 6 למכרז מס' 101/06.2024 (עמ' 138–140). המיקוד: מה שונה, חסר או פחות מבוקר במסלול ארגז החול לעומת שני המסלולים האחרים.</div>
+  <div class="meta-row">
+    <div class="meta-pill editable"><b>אחראי מיזם:</b> מינהל טכנולוגיות דיגיטליות ומידע, משרד החינוך</div>
+    <div class="meta-pill editable"><b>מסגרת:</b> מכרז 101/06.2024, נספח 6 – תרשימי זרימה (מסלולים)</div>
+    <div class="meta-pill editable"><b>היקף:</b> כלים דיגיטליים שטרם ניתן להם אישור, הנבדקים במסגרת ארגז חול רגולטורי</div>
+    <div class="meta-pill editable"><b>שותפים:</b> קבלן הבדיקות · ספקי מוצרים דיגיטליים · יוזמת משרד החינוך (קולות קוראים)</div>
+  </div>
+</header>
+
+<div class="anchors-section">
+  <h3>עוגני תפיסה מהמסמך</h3>
+  <div class="anchors-wrap">
+    <span class="anchor-tag">מסלול ארגז חול</span>
+    <span class="anchor-tag">מסלול רגיל</span>
+    <span class="anchor-tag">מסלול מקוצר</span>
+    <span class="anchor-tag">קולות קוראים</span>
+    <span class="anchor-tag">יוזמת המשרד</span>
+    <span class="anchor-tag">יוזמת הספק</span>
+    <span class="anchor-tag">תוכן פדגוגי / לא פדגוגי</span>
+    <span class="anchor-tag">בדיקות טכנולוגיות ואבטחת מידע</span>
+    <span class="anchor-tag">תמחור לפי קול קורא</span>
+    <span class="anchor-tag">הפחתה רגולטורית</span>
+  </div>
+</div>
+
+<div class="stages-row">
+  <div class="stage"><span class="ic">📐</span>תכנון</div>
+  <div class="stage"><span class="ic">⚙️</span>ביצוע</div>
+  <div class="stage"><span class="ic">📊</span>בקרה</div>
+</div>
+
+<div class="compare-row">
+  <div class="compare-card">
+    <h4 class="editable">מסלול רגיל / מקוצר (עמ' 138–139)</h4>
+    <div class="editable">שלבים נפרדים בתשלום קבוע · בדיקה מפורשת של "תוכן פדגוגי" מול "לא פדגוגי" מול מזכירות פדגוגית · פתוח ליוזמת הספק</div>
+  </div>
+  <div class="compare-card sandbox">
+    <h4 class="editable">מסלול ארגז חול (עמ' 140)</h4>
+    <div class="editable">תלוי ביוזמת המשרד בלבד (קולות קוראים) · ללא branching מפורש לבדיקת תוכן פדגוגי · תמחור לא קבוע – נגזר מקול קורא ספציפי</div>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-num red">1</div><div class="stat-lbl">סיכונים בחומרה גבוהה</div></div>
+  <div class="stat-card"><div class="stat-num yellow">2</div><div class="stat-lbl">סיכונים בחומרה בינונית</div></div>
+  <div class="stat-card"><div class="stat-num total">3</div><div class="stat-lbl">סה"כ סיכונים ממופים</div></div>
+</div>
+
+<div class="risk-groups">
+
+  <!-- קטגוריה 1 -->
+  <div class="cat-header">
+    <span class="ic">👩‍🏫</span>
+    <span class="name editable">פדגוגי</span>
+    <span class="desc editable">היעדר בקרת תוכן פדגוגית מובנית במסלול ארגז החול</span>
+  </div>
+  <div class="risk-card red-border">
+    <div class="risk-head">
+      <div><span class="risk-num">1</span><span class="risk-title editable">מסלול ארגז החול אינו כולל branching מפורש לבדיקת "תוכן פדגוגי" מול "לא פדגוגי" ואישור מזכירות פדגוגית – בשונה ממסלול רגיל ומקוצר</span></div>
+      <div class="sev-tag sev-red editable">🔴 חומרה גבוהה</div>
+    </div>
+    <div class="risk-topics">
+      <span>בקרת תוכן</span><span>השוואת מסלולים</span><span>נספח 6, עמ' 138–140</span>
+    </div>
+    <div class="score-row">
+      <div>הסתברות: <b>7</b>/10</div>
+      <div>עוצמת נזק: <b>9</b>/10</div>
+      <div>ציון חומרה: <b>63</b>/100</div>
+    </div>
+    <div class="desc-box">
+      <span class="quote editable"><strong>המכרז (נספח 6, מסלול ארגז חול, עמ' 140):</strong> "הקבלן יקבל ממשרד החינוך פניות לביצוע בדיקת מוצר דיגיטלי במסגרת קולות קוראים... במקרים אלו הבדיקות הטכנולוגיות ובדיקות אבטחת המידע וכן המשך תהליך האישור יעשה על ידי הקבלן." – לעומת <strong>מסלול רגיל/מקוצר (עמ' 138–139):</strong> "בהתאם לתוצאות בדיקת הטכנולוגיות – מוצר הכולל תוכן פדגוגי / מוצר שאינו כולל תוכן פדגוגי... יועבר על ידי הקבלן למזכירות הפדגוגית (אגף ספרי לימוד) ... לצורך אישור תוכן."</span>
+      <span class="editable">בשני המסלולים האחרים קיים שלב ייעודי ומפורש שבו כל מוצר מסווג ביחס לתוכן פדגוגי ומועבר לאישור אגף ספרי לימוד. בתרשים מסלול ארגז החול אין כל אזכור לשלב מקביל – כלים חדשניים שטרם אושרו, המיועדים לרוב לניסוי פדגוגי, עלולים לעבור בדיקה טכנולוגית ואבטחתית בלבד, ללא בקרת תוכן ייעודית, בניגוד לעקרון הפיקוח האחראי (RRI).</span>
+    </div>
+    <div class="impact-opp">
+      <div class="impact-col">
+        <div class="h">⚠️ השלכות אפשריות</div>
+        <ul>
+          <li class="editable">כלים חדשניים בשימוש פדגוגי ללא בדיקת תוכן · חוסר אחידות בין מסלולים · פגיעה באמון המורים בכלים "מאושרי ארגז חול"</li>
+        </ul>
+      </div>
+      <div class="opp-col">
+        <div class="h">✅ הזדמנויות</div>
+        <ul>
+          <li class="editable">שילוב שלב בקרת תוכן קל-משקל בארגז החול · מעורבות מוקדמת של אגף ספרי לימוד בקולות קוראים · חיזוק אמון המורים בניסוי המבוקר</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cond-list">
+      <div class="h">תנאי אישור</div>
+      <ol>
+        <li class="editable">הוספת שלב סינון תוכן פדגוגי מקוצר (אף אם לא מלא) לכל כלי הנבדק בארגז החול</li>
+        <li class="editable">עדכון תרשים מסלול ארגז החול בנספח 6 כך שיכלול הפניה מפורשת לגורם פדגוגי מוסמך</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- קטגוריה 2 -->
+  <div class="cat-header">
+    <span class="ic">🏫</span>
+    <span class="name editable">ארגוני / תפעולי</span>
+    <span class="desc editable">מי רשאי ליזום כניסה למסלול ארגז החול</span>
+  </div>
+  <div class="risk-card yellow-border">
+    <div class="risk-head">
+      <div><span class="risk-num">2</span><span class="risk-title editable">כניסה למסלול ארגז החול תלויה ביוזמת משרד החינוך בלבד ("קולות קוראים") – בשונה ממסלול רגיל ומקוצר הפתוחים גם ליוזמת הספק</span></div>
+      <div class="sev-tag sev-yellow editable">🟡 חומרה בינונית</div>
+    </div>
+    <div class="risk-topics">
+      <span>נגישות מסלול</span><span>יוזמה חד-כיוונית</span><span>נספח 6, עמ' 138–140</span>
+    </div>
+    <div class="score-row">
+      <div>הסתברות: <b>6</b>/10</div>
+      <div>עוצמת נזק: <b>7</b>/10</div>
+      <div>ציון חומרה: <b>42</b>/100</div>
+    </div>
+    <div class="desc-box">
+      <span class="quote editable"><strong>המכרז (נספח 6, מסלול ארגז חול, עמ' 140):</strong> "בהתאם לצורך, הקבלן יקבל ממשרד החינוך פניות לביצוע בדיקת מוצר דיגיטלי במסגרת קולות קוראים המפורסמים ע"י המשרד." – לעומת <strong>מסלול רגיל (עמ' 138):</strong> "שלב א' – היכרות עם הספק" ו<strong>מסלול מקוצר (עמ' 139):</strong> "ביוזמת הספק."</span>
+      <span class="editable">בשני המסלולים האחרים הספק יכול ליזום פנייה עצמאית. במסלול ארגז החול הפנייה מתבצעת רק כאשר המשרד מפרסם קול קורא – כך שספק או מוסד חינוכי המעוניינים לבחון כלי חדשני בתנאי הפחתה רגולטורית אינם יכולים לפנות ישירות, מה שמצמצם בפועל את השימוש בהזדמנות שהמסלול נועד לספק.</span>
+    </div>
+    <div class="impact-opp">
+      <div class="impact-col">
+        <div class="h">⚠️ השלכות אפשריות</div>
+        <ul>
+          <li class="editable">מיעוט כלים שנבדקים בפועל בארגז חול · ספקים/בתי ספר עוקפים ומנסים כלים עצמאית · אי-מיצוי פוטנציאל ההפחתה הרגולטורית</li>
+        </ul>
+      </div>
+      <div class="opp-col">
+        <div class="h">✅ הזדמנויות</div>
+        <ul>
+          <li class="editable">פתיחת ערוץ פנייה יזומה של ספקים לארגז חול · תדירות גבוהה יותר של קולות קוראים · שיתוף פעולה עם רשויות חינוך חלוצות</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cond-list">
+      <div class="h">תנאי אישור</div>
+      <ol>
+        <li class="editable">בחינת הוספת ערוץ פנייה יזומה (Bottom-up) לכניסה לארגז החול, בנוסף לקולות קוראים</li>
+        <li class="editable">פרסום לוח זמנים שנתי מינימלי לקולות קוראים בתחום ארגז החול</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- קטגוריה 3 -->
+  <div class="cat-header">
+    <span class="ic">🏛️</span>
+    <span class="name editable">רגולטורי / אסדרה</span>
+    <span class="desc editable">שקיפות ואחידות התמחור בין המסלולים</span>
+  </div>
+  <div class="risk-card yellow-border">
+    <div class="risk-head">
+      <div><span class="risk-num">3</span><span class="risk-title editable">מנגנון התשלום במסלול ארגז החול אינו קבוע מראש (נגזר מכל קול קורא בנפרד) – בשונה מהתמחור השקוף והאחיד במסלול הרגיל והמקוצר</span></div>
+      <div class="sev-tag sev-yellow editable">🟡 חומרה בינונית</div>
+    </div>
+    <div class="risk-topics">
+      <span>שקיפות תמחור</span><span>אי-אחידות</span><span>נספח 6, עמ' 138–140</span>
+    </div>
+    <div class="score-row">
+      <div>הסתברות: <b>5</b>/10</div>
+      <div>עוצמת נזק: <b>6</b>/10</div>
+      <div>ציון חומרה: <b>30</b>/100</div>
+    </div>
+    <div class="desc-box">
+      <span class="quote editable"><strong>המכרז (נספח 6, מסלול ארגז חול, עמ' 140):</strong> "התשלום במסלול זה יתבצע ע"י הספק בעל המוצר הדיגיטלי או לחלופין ע"י המשרד בהתאם לקריטריונים אשר יפורטו בקול הקורא הספציפי." – לעומת <strong>מסלול רגיל (עמ' 138):</strong> תשלום קבוע ומדורג (300₪+מע"מ, 40%, 40%, 20%), ו<strong>מסלול מקוצר (עמ' 139):</strong> תשלום מבוסס הצהרות ותלוי יוזמה (משרד/ספק).</span>
+      <span class="editable">בעוד שני המסלולים האחרים מגדירים מראש מי משלם וכמה, במסלול ארגז החול התמחור נקבע מחדש בכל קול קורא – מה שעלול ליצור חוסר ודאות תקציבית לספקים המעוניינים להשתתף, ואי-אחידות בין קולות קוראים שונים באותו נושא.</span>
+    </div>
+    <div class="impact-opp">
+      <div class="impact-col">
+        <div class="h">⚠️ השלכות אפשריות</div>
+        <ul>
+          <li class="editable">חוסר ודאות תקציבית לספקים קטנים · אי-שוויון בין קולות קוראים שונים · ירידה במוטיבציה להשתתף במסלול</li>
+        </ul>
+      </div>
+      <div class="opp-col">
+        <div class="h">✅ הזדמנויות</div>
+        <ul>
+          <li class="editable">קביעת מסגרת תמחור אחידה-מינימלית לכלל קולות הקוראים · שקיפות מוגברת מעודדת השתתפות ספקים חדשניים וקטנים</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cond-list">
+      <div class="h">תנאי אישור</div>
+      <ol>
+        <li class="editable">פרסום מסגרת תמחור מנחה אחידה למסלול ארגז החול, החלה על כלל הקולות הקוראים</li>
+        <li class="editable">גילוי תנאי התשלום הצפויים כבר בשלב פרסום הקול הקורא, לא רק בסיומו</li>
+      </ol>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary-section">
+  <h3>טבלת סיכום</h3>
+  <table class="summary-table">
+    <thead>
+      <tr><th>#</th><th>ציון</th><th>שם הסיכון</th><th>השלכות עיקריות</th><th>תנאי אישור מרכזי</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td><td>63 🔴</td>
+        <td class="editable">היעדר בדיקת תוכן פדגוגי מובנית בארגז החול</td>
+        <td class="editable">כלים בשימוש פדגוגי ללא בקרת תוכן · פגיעה באמון</td>
+        <td class="editable">שלב סינון פדגוגי מקוצר + הפניה לגורם מוסמך</td>
+      </tr>
+      <tr>
+        <td>2</td><td>42 🟡</td>
+        <td class="editable">כניסה לארגז חול תלויה ביוזמת המשרד בלבד</td>
+        <td class="editable">מיעוט כלים נבדקים · עקיפה עצמאית בשטח</td>
+        <td class="editable">ערוץ פנייה יזומה + לוח זמנים שנתי לקולות קוראים</td>
+      </tr>
+      <tr>
+        <td>3</td><td>30 🟡</td>
+        <td class="editable">תמחור לא אחיד, נגזר מכל קול קורא בנפרד</td>
+        <td class="editable">אי-ודאות תקציבית · אי-שוויון בין ספקים</td>
+        <td class="editable">מסגרת תמחור מנחה אחידה + גילוי מוקדם</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-footer">
+  <div>
+    <div class="editable">ניהול סיכונים למסלול ארגז חול רגולטורי – משרד החינוך, מינהל טכנולוגיות דיגיטליות ומידע</div>
+    <div class="editable">מקורות: מכרז 101/06.2024 – "בדיקות טכנולוגיות ואבטחת מידע עבור חומרי לימוד דיגיטליים...", נספח 6 (עמ' 138–140)</div>
+  </div>
+  <div class="credit editable">פיתוח ועיצוב המוצר: ד"ר אסף אוזן</div>
+</div>
+
+</div>
+</body>
+</html>
